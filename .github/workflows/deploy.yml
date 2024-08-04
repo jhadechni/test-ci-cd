@@ -36,9 +36,8 @@ jobs:
 
       - name: Push Docker Image
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/test-app:latest
-  
-  deploy:
-    - name: SSH to Droplet and Update Container
+
+      - name: SSH to Droplet and Update Container
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.DROPLET_IP }}
