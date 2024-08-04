@@ -45,6 +45,7 @@ jobs:
           password: ${{ secrets.DROPLET_PASSWORD }}
           port: 22
           script: |
+            ssh root@${{ secrets.DROPLET_IP }}
             docker stop test-app
             docker rm test-app
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/test-app:latest
