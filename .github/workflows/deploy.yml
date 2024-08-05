@@ -1,53 +1,73 @@
-name: Deploy Frontend to Droplet
+name: Deploy to DigitalOcean
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
-  build_and_push:
+  build:
     runs-on: ubuntu-latest
+    outputs:
+      image_sha: ${{ steps.build.outputs.image_sha }}
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
-
-      - name: setup git config
-        run: |
-          git config user.name "jhadechni"
-          git config user.email "jaimeluissierra88@gmail.com"
-
-      - name: Install Dependencies
-        run: npm install --force
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
       - name: Log in to Docker Hub
-        run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-
-      - name: Build Docker Image
-        run: docker build --tag test-app .
-
-      - name: Tag image
-        run:  docker tag test-app ${{ secrets.DOCKERHUB_USERNAME }}/test-app:latest
-
-      - name: Push Docker Image
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/test-app:latest
-
-      - name: SSH to Droplet and Update Container
-        uses: appleboy/ssh-action@master
+        uses: docker/login-action@v2
         with:
-          host: ${{ secrets.DROPLET_IP }}
-          username: root
-          password: ${{ secrets.DROPLET_PASSWORD }}
-          port: 22
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker image
+        id: build
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/my-react-app:${{ github.sha }} .
+          echo "::set-output name=image_sha::${{ github.sha }}"
+
+  tag:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Tag and push Docker image
+        run: |
+          docker tag ${{ secrets.DOCKER_USERNAME }}/my-react-app:${{ needs.build.outputs.image_sha }} ${{ secrets.DOCKER_USERNAME }}/my-react-app:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/my-react-app:${{ needs.build.outputs.image_sha }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/my-react-app:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: tag
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: SSH into DigitalOcean droplet
+        uses: appleboy/ssh-action@v0.1.3
+        with:
+          host: ${{ secrets.DROPLET_HOST }}
+          username: ${{ secrets.DROPLET_USER }}
+          key: ${{ secrets.DROPLET_SSH_KEY }}
           script: |
-            ssh root@${{ secrets.DROPLET_IP }}
-            docker stop test-app
-            docker rm test-app
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/test-app:latest
-            docker run -d --name test-app -p 80:80 ${{ secrets.DOCKERHUB_USERNAME }}/test-app:latest
-            echo 'Deployment to digital ocean finished'
+            docker pull ${{ secrets.DOCKER_USERNAME }}/my-react-app:latest
+            docker stop my-react-app || true
+            docker rm my-react-app || true
+            docker run -d -p 80:80 --name my-react-app ${{ secrets.DOCKER_USERNAME }}/my-react-app:latest
+            echo "Deployed successfully :)"
