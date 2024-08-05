@@ -1,12 +1,12 @@
 .App {
   text-align: center;
+  background-color: #282c34
 }
 
 .App-logo {
   height: 40vmin;
   pointer-events: none;
 }
-
 
 .App-header {
   background-color: #282c34;
@@ -23,3 +23,71 @@
   color: #61dafb;
 }
 
+.cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 20px;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  margin: 10px;
+  padding: 20px;
+  max-width: 200px;
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.card img {
+  border-radius: 10px;
+  max-width: 100%;
+}
+
+.card h2 {
+  font-size: 1.5em;
+  margin: 10px 0;
+  color: white;
+}
+
+.card p {
+  font-size: 1em;
+  margin: 5px 0;
+  color: white;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  margin: 20px;
+}
+
+.pagination-controls button {
+  background-color: white;
+  border: none;
+  color: black;
+  padding: 10px 20px;
+  margin: 0 10px;
+  font-size: 1em;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.pagination-controls button:hover {
+  background-color: #21a1f1;
+}
+
+.pagination-controls button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
