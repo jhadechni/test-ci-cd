@@ -53,7 +53,7 @@ jobs:
               docker rm my-react-app
             fi
             echo "Copying deploy.env to droplet..."
-            scp -i ${{ secrets.DROPLET_SSH_KEY }} deploy.env ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }}:/path/to/deploy.env
+            scp -i ${{ secrets.DROPLET_SSH_KEY }} deploy.env ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }}:/deploy.env
             echo "Starting new container..."
-            docker run -d -p 80:80 --name my-react-app --env-file ./deploy.env ${{ secrets.DOCKER_USERNAME }}/my-react-app:latest
+            docker run -d -p 80:80 --name my-react-app --env-file /deploy.env ${{ secrets.DOCKER_USERNAME }}/my-react-app:latest
 
