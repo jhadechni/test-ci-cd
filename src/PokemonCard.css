@@ -1,0 +1,32 @@
+.pokemon-card {
+    background: linear-gradient(180deg, #ffcc00, #ff9900);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    margin: 10px;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    color: black;
+    transition: transform 0.3s ease;
+    max-width: 200px;
+  }
+  
+  .pokemon-card:hover {
+    transform: scale(1.05);
+  }
+  
+  .pokemon-card-content img {
+    border-radius: 10px;
+    max-width: 100%;
+  }
+  
+  .pokemon-card-content h2 {
+    font-size: 1.5em;
+    margin: 10px 0;
+  }
+  
+  .pokemon-card-content p {
+    font-size: 1em;
+    margin: 5px 0;
+  }
+  
