@@ -45,11 +45,9 @@ jobs:
           script: |
             echo "SSH connection successful!"
             docker pull ${{ secrets.DOCKER_USERNAME }}/my-react-app:latest
-            if [ "$(docker ps -q -f name=my-react-app)" ]; then
-              echo "Stopping existing container..."
-              docker stop my-react-app
-              docker rm my-react-app
-            fi
+            echo "Stopping existing container..."
+            docker stop my-react-app
+            docker rm my-react-app
             echo "Starting new container..."
             docker run -d -p 80:80 --name my-react-app ${{ secrets.DOCKER_USERNAME }}/my-react-app:latest
 
